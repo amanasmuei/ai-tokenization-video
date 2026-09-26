@@ -5,7 +5,8 @@ synthesised one sentence at a time and joined with short pauses. Output:
   public/voiceover/<scene>.wav   – audio per scene
   src/data/voiceover.json        – per-scene duration + per-sentence start times,
                                    used by the Remotion scenes to sync animation beats.
-Usage: python3 scripts/voiceover.py [--voice af_heart] [--speed 1.0]
+Usage: python3 scripts/voiceover.py [--voice af_heart] [--speed 1.0] [--only <scene-id>]
+After regenerating, run scripts/mix_audio.py to rebuild the final soundtrack.
 """
 import argparse, json, os, re, urllib.request
 import numpy as np
@@ -15,7 +16,7 @@ from kokoro_onnx import Kokoro
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CACHE = os.path.join(ROOT, ".cache", "kokoro")
 BASE = "https://github.com/thewh1teagle/kokoro-onnx/releases/download/model-files-v1.0/"
-FILES = {"model": "kokoro-v1.0.int8.onnx", "voices": "voices-v1.0.bin"}
+FILES = {"model": "kokoro-v1.0.onnx", "voices": "voices-v1.0.bin"}  # full-precision model (best quality)
 SENTENCE_GAP = 0.28  # seconds of silence between sentences
 TAIL = 0.6           # silence at end of each scene
 

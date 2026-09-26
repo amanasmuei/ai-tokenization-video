@@ -1,223 +1,223 @@
 1
-00:00:00,400 --> 00:00:04,864
+00:00:02,400 --> 00:00:06,905
 Every answer an AI model gives you is built one token at a time.
 
 2
-00:00:04,864 --> 00:00:09,955
+00:00:06,905 --> 00:00:12,044
 Behind every token sits a chain of silicon, memory, networking and power.
 
 3
-00:00:10,025 --> 00:00:16,511
+00:00:12,114 --> 00:00:18,661
 This is the journey from GPU to token, and why the token has become the unit of AI economics.
 
 4
-00:00:17,600 --> 00:00:20,510
+00:00:19,733 --> 00:00:22,642
 It starts with the accelerator.
 
 5
-00:00:20,510 --> 00:00:34,309
+00:00:22,642 --> 00:00:36,432
 An NVIDIA H100 packs 132 streaming multiprocessors with fourth-generation Tensor Cores: roughly one petaFLOP of dense BF16 compute, and two at FP8.
 
 6
-00:00:34,403 --> 00:00:43,508
+00:00:36,526 --> 00:00:45,625
 But compute is only half the story. 80 GB of HBM3 feeds those cores at 3.35 terabytes per second.
 
 7
-00:00:43,602 --> 00:00:51,487
+00:00:45,719 --> 00:00:53,600
 H200 raises that to 141 GB at 4.8 TB/s, and Blackwell goes further, with native FP4.
 
 8
-00:00:52,600 --> 00:00:54,607
+00:00:54,700 --> 00:00:56,727
 One GPU is never enough.
 
 9
-00:00:54,607 --> 00:01:05,058
+00:00:56,727 --> 00:01:07,282
 Inside an HGX server, eight GPUs are joined by NVLink and NVSwitch at 900 GB/s per GPU, so they act as one large accelerator.
 
 10
-00:01:05,142 --> 00:01:16,430
+00:01:07,367 --> 00:01:18,767
 Across servers, a rail-optimised 400-gigabit InfiniBand or RoCE fabric, one NIC per GPU, links thousands of GPUs into a single cluster.
 
 11
-00:01:16,514 --> 00:01:33,236
+00:01:18,851 --> 00:01:35,741
 Add parallel storage for data and checkpoints, and serious power and cooling: an eight-GPU server draws around ten kilowatts; a rack-scale Blackwell NVL72 needs around 120, with direct liquid cooling.
 
 12
-00:01:34,333 --> 00:01:39,918
+00:01:36,833 --> 00:01:42,396
 Building this is capital-intensive, and GPU generations turn over every year or two.
 
 13
-00:01:39,968 --> 00:01:45,851
+00:01:42,446 --> 00:01:48,394
 GPU-as-a-Service turns that infrastructure into an elastic, multi-tenant platform.
 
 14
-00:01:45,901 --> 00:01:50,056
+00:01:48,444 --> 00:01:52,535
 Bare-metal nodes and GPU-passthrough VMs at the base.
 
 15
-00:01:50,106 --> 00:01:54,688
+00:01:52,585 --> 00:01:57,188
 Kubernetes with the GPU Operator, or Slurm, for orchestration.
 
 16
-00:01:54,738 --> 00:02:00,984
+00:01:57,238 --> 00:02:03,612
 Multi-Instance GPU splits one H100 into up to seven isolated slices.
 
 17
-00:02:01,034 --> 00:02:06,000
+00:02:03,662 --> 00:02:08,628
 DCGM telemetry tracks utilisation, memory, power and errors.
 
 18
-00:02:06,050 --> 00:02:08,840
+00:02:08,678 --> 00:02:11,490
 Customers consume it by the GPU-hour.
 
 19
-00:02:08,890 --> 00:02:14,418
+00:02:11,540 --> 00:02:17,089
 With TM GPUaaS, on sovereign, Malaysia-hosted infrastructure.
 
 20
-00:02:15,433 --> 00:02:19,281
+00:02:18,100 --> 00:02:21,933
 But a language model doesn't think in GPU-hours.
 
 21
-00:02:19,281 --> 00:02:20,884
+00:02:21,933 --> 00:02:23,530
 It thinks in tokens.
 
 22
-00:02:20,964 --> 00:02:33,467
+00:02:23,610 --> 00:02:36,066
 A byte-pair-encoding tokenizer splits text into sub-word units from a fixed vocabulary: about 100 thousand entries in GPT-4's cl100k, 200 thousand in o200k.
 
 23
-00:02:33,548 --> 00:02:38,277
+00:02:36,146 --> 00:02:40,857
 Each token becomes an integer ID, then an embedding vector.
 
 24
-00:02:38,357 --> 00:02:41,643
+00:02:40,937 --> 00:02:44,210
 And tokenization is not language-neutral.
 
 25
-00:02:41,723 --> 00:02:50,380
+00:02:44,290 --> 00:02:52,914
 The same sentence in Bahasa Melayu costs 36 percent more tokens with o200k, and 82 percent more with cl100k.
 
 26
-00:02:50,460 --> 00:02:54,948
+00:02:52,994 --> 00:02:57,465
 More tokens means more compute, more latency, more cost.
 
 27
-00:02:56,033 --> 00:02:58,140
+00:02:58,567 --> 00:03:00,696
 Inference runs in two phases.
 
 28
-00:02:58,190 --> 00:03:01,087
+00:03:00,746 --> 00:03:03,642
 Prefill processes the whole prompt in parallel.
 
 29
-00:03:01,137 --> 00:03:04,439
+00:03:03,692 --> 00:03:07,058
 It is compute-bound, and it sets time-to-first-token.
 
 30
-00:03:04,489 --> 00:03:10,948
+00:03:07,108 --> 00:03:13,568
 Decode then generates one token per step, and every step streams the full set of weights from HBM.
 
 31
-00:03:10,998 --> 00:03:13,468
+00:03:13,618 --> 00:03:16,088
 That makes decode memory-bandwidth-bound.
 
 32
-00:03:13,518 --> 00:03:18,847
+00:03:16,138 --> 00:03:21,552
 Llama 3.1 8B in BF16 is 16 GB of weights.
 
 33
-00:03:18,897 --> 00:03:28,180
+00:03:21,602 --> 00:03:30,948
 At 3.35 TB/s, a single stream tops out near 200 tokens per second, while the Tensor Cores sit mostly idle.
 
 34
-00:03:29,200 --> 00:03:35,458
+00:03:31,967 --> 00:03:38,245
 To avoid recomputing attention, every token's keys and values are cached.
 
 35
-00:03:35,458 --> 00:03:43,602
+00:03:38,245 --> 00:03:46,416
 For Llama 3.1 70B, with 80 layers and grouped-query attention, that's 320 KB per token in BF16.
 
 36
-00:03:43,687 --> 00:03:54,917
+00:03:46,502 --> 00:03:57,769
 One 128K-token context needs about 40 GB of KV cache: memory that competes directly with batch size, and therefore with throughput.
 
 37
-00:03:56,033 --> 00:03:58,482
+00:03:58,867 --> 00:04:01,294
 This is where the serving stack earns its keep.
 
 38
-00:03:58,532 --> 00:04:02,580
+00:04:01,344 --> 00:04:05,329
 Continuous batching shares each weight read across many requests.
 
 39
-00:04:02,630 --> 00:04:07,724
+00:04:05,379 --> 00:04:10,516
 PagedAttention allocates KV cache in blocks, eliminating fragmentation.
 
 40
-00:04:07,774 --> 00:04:10,351
+00:04:10,566 --> 00:04:13,185
 FlashAttention keeps attention on-chip.
 
 41
-00:04:10,401 --> 00:04:14,386
+00:04:13,235 --> 00:04:17,305
 FP8 and FP4 quantisation cut bytes per weight.
 
 42
-00:04:14,436 --> 00:04:19,466
+00:04:17,355 --> 00:04:22,428
 Speculative decoding drafts several tokens and verifies them in one pass.
 
 43
-00:04:19,516 --> 00:04:27,746
+00:04:22,478 --> 00:04:30,558
 Prefix caching reuses shared prompts, and disaggregated serving puts prefill and decode on separately tuned GPU pools.
 
 44
-00:04:27,796 --> 00:04:35,670
+00:04:30,608 --> 00:04:38,419
 Engines like vLLM, SGLang and TensorRT-LLM combine these for order-of-magnitude gains.
 
 45
-00:04:36,700 --> 00:04:45,869
+00:04:39,433 --> 00:04:48,623
 So the real output of a GPU is tokens per second, delivered within latency targets for time-to-first-token and inter-token latency.
 
 46
-00:04:45,919 --> 00:04:48,986
+00:04:48,673 --> 00:04:51,698
 That gives the core equation of AI economics.
 
 47
-00:04:49,036 --> 00:04:56,285
+00:04:51,748 --> 00:04:59,039
 Cost per million tokens equals the GPU-hour cost, divided by tokens per hour, times one million.
 
 48
-00:04:56,335 --> 00:05:04,757
+00:04:59,089 --> 00:05:07,447
 Illustratively: at ten dollars per GPU-hour and 200 tokens per second, that's nearly fourteen dollars per million tokens.
 
 49
-00:05:04,807 --> 00:05:11,458
+00:05:07,497 --> 00:05:14,191
 Optimise the same GPU to 5,000 tokens per second, and it drops to about 56 cents.
 
 50
-00:05:11,508 --> 00:05:12,805
+00:05:14,241 --> 00:05:15,538
 Same hardware.
 
 51
-00:05:12,855 --> 00:05:15,076
+00:05:15,588 --> 00:05:17,830
 Twenty-five times cheaper tokens.
 
 52
-00:05:16,100 --> 00:05:23,757
+00:05:18,833 --> 00:05:26,490
 That is why the industry is moving up the stack: from selling hardware, to selling GPU-hours, to selling tokens.
 
 53
-00:05:23,757 --> 00:05:34,764
+00:05:26,490 --> 00:05:37,498
 Model-as-a-Service endpoints with OpenAI-compatible APIs, metered per input and output token, let customers pay for intelligence produced, not for idle capacity.
 
 54
-00:05:34,833 --> 00:05:42,285
+00:05:37,566 --> 00:05:45,018
 For the provider, the metric that matters becomes tokens per second per GPU, and ultimately, tokens per watt.
 
 55
-00:05:43,367 --> 00:05:46,806
+00:05:46,100 --> 00:05:49,495
 From silicon, to GPUaaS, to tokens.
 
 56
-00:05:46,806 --> 00:05:53,388
+00:05:49,495 --> 00:05:55,995
 TM GPUaaS: sovereign GPU cloud for AI, built for the token economy.

@@ -1,6 +1,7 @@
 import React from "react";
 import { Composition } from "remotion";
-import { GpuToToken, totalFrames } from "./Video";
+import { totalFrames } from "./timeline";
+import { GpuToToken } from "./Video";
 import { FPS, H, W } from "./theme";
 
 export const RemotionRoot: React.FC = () => (

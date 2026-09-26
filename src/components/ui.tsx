@@ -1,5 +1,5 @@
 import React from "react";
-import { AbsoluteFill, Easing, interpolate, spring, useCurrentFrame, useVideoConfig } from "remotion";
+import { Easing, interpolate, spring, useCurrentFrame, useVideoConfig } from "remotion";
 import { C, F } from "../theme";
 
 /** Pure 0→1 eased progress; safe to call inside loops/conditionals. */
@@ -19,27 +19,42 @@ export const useSpring = (at: number, damping = 18) => {
   return spring({ frame: frame - at, fps, config: { damping, mass: 0.8 } });
 };
 
-/** Scene-level fade in/out so cuts between chapters feel continuous. */
-export const SceneFade: React.FC<{ duration: number; children: React.ReactNode }> = ({ duration, children }) => {
-  const frame = useCurrentFrame();
-  const o = interpolate(frame, [0, 12, duration - 12, duration], [0, 1, 1, 0], {
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
-  });
-  return <AbsoluteFill style={{ opacity: o }}>{children}</AbsoluteFill>;
-};
-
 export const Reveal: React.FC<{
   at: number;
   y?: number;
   x?: number;
   dur?: number;
+  blur?: number;
   style?: React.CSSProperties;
   children: React.ReactNode;
-}> = ({ at, y = 24, x = 0, dur = 18, style, children }) => {
+}> = ({ at, y = 24, x = 0, dur = 18, blur = 6, style, children }) => {
   const p = useIn(at, dur);
   return (
-    <div style={{ opacity: p, transform: `translate(${(1 - p) * x}px, ${(1 - p) * y}px)`, ...style }}>{children}</div>
+    <div
+      style={{
+        opacity: p,
+        transform: `translate(${(1 - p) * x}px, ${(1 - p) * y}px)`,
+        filter: p < 1 && blur ? `blur(${(1 - p) * blur}px)` : undefined,
+        ...style,
+      }}
+    >
+      {children}
+    </div>
+  );
+};
+
+/** Text slides up from behind a mask — the classic broadcast title reveal. */
+export const MaskReveal: React.FC<{ at: number; dur?: number; style?: React.CSSProperties; children: React.ReactNode }> = ({
+  at,
+  dur = 22,
+  style,
+  children,
+}) => {
+  const p = useIn(at, dur);
+  return (
+    <div style={{ overflow: "hidden", paddingBottom: "0.08em", marginBottom: "-0.08em", ...style }}>
+      <div style={{ transform: `translateY(${(1 - p) * 110}%)` }}>{children}</div>
+    </div>
   );
 };
 
@@ -77,6 +92,10 @@ export const Heading: React.FC<{ children: React.ReactNode; size?: number; style
       textTransform: "uppercase",
       color: C.text,
       letterSpacing: "-0.005em",
+      backgroundImage: "linear-gradient(180deg, #FFFFFF 30%, #C9D0FF 100%)",
+      WebkitBackgroundClip: "text",
+      backgroundClip: "text",
+      WebkitTextFillColor: style?.color ? undefined : "transparent",
       ...style,
     }}
   >
@@ -90,20 +109,26 @@ export const SceneTitle: React.FC<{ chapter: string; eyebrow: string; title: Rea
   eyebrow,
   title,
   at = 4,
-}) => (
-  <div style={{ position: "absolute", left: 120, top: 150 }}>
-    <Reveal at={at}>
-      <Eyebrow>
-        <span style={{ color: C.orange }}>{chapter}</span>
-        <span style={{ margin: "0 14px", opacity: 0.5 }}>/</span>
-        {eyebrow}
-      </Eyebrow>
-    </Reveal>
-    <Reveal at={at + 6} style={{ marginTop: 18 }}>
-      <Heading>{title}</Heading>
-    </Reveal>
-  </div>
-);
+}) => {
+  const bar = useIn(at, 20);
+  return (
+    <div style={{ position: "absolute", left: 120, top: 150 }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+        <div style={{ width: 44 * bar, height: 3, background: `linear-gradient(90deg, ${C.orange}, ${C.accent})` }} />
+        <Reveal at={at + 4} x={-16} y={0} blur={0}>
+          <Eyebrow>
+            <span style={{ color: C.orange }}>{chapter}</span>
+            <span style={{ margin: "0 14px", opacity: 0.5 }}>/</span>
+            {eyebrow}
+          </Eyebrow>
+        </Reveal>
+      </div>
+      <MaskReveal at={at + 8} style={{ marginTop: 16 }}>
+        <Heading>{title}</Heading>
+      </MaskReveal>
+    </div>
+  );
+};
 
 export const Panel: React.FC<{
   style?: React.CSSProperties;
@@ -112,11 +137,11 @@ export const Panel: React.FC<{
 }> = ({ style, accent, children }) => (
   <div
     style={{
-      background: C.panel,
+      background: "linear-gradient(180deg, rgba(255,255,255,0.075) 0%, rgba(255,255,255,0.02) 100%)",
       border: `1px solid ${C.line}`,
       borderTop: accent ? `3px solid ${accent}` : `1px solid ${C.line}`,
+      boxShadow: "0 40px 80px -40px rgba(0,0,0,0.75), inset 0 1px 0 rgba(255,255,255,0.06)",
       padding: "26px 30px",
-      backdropFilter: "blur(6px)",
       ...style,
     }}
   >

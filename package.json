@@ -7,6 +7,8 @@
     "studio": "remotion studio",
     "tokens": "node scripts/tokenize.mjs",
     "voiceover": "python3 scripts/voiceover.py",
+    "soundtrack": "python3 scripts/mix_audio.py",
+    "captions": "node scripts/captions.mjs",
     "render": "remotion render GpuToToken out/gpu-to-token.mp4",
     "still": "remotion still GpuToToken out/still.png"
   },

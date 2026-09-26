@@ -1,9 +1,14 @@
 # From GPU to Token — TM GPUaaS technical explainer
 
-A ~6-minute, 1080p English explainer video for an expert AI audience. It follows the path
+A 6-minute, 1080p English explainer video for an expert AI audience. It follows the path
 from accelerator hardware, through GPU-as-a-Service, to tokenization and the unit economics
 of LLM inference. Built with [Remotion](https://remotion.dev) (React) using the TM Global / TM GPUaaS brand
-system. The voiceover is generated offline with [Kokoro TTS](https://github.com/thewh1teagle/kokoro-onnx).
+system. The voiceover is generated offline with [Kokoro TTS](https://github.com/thewh1teagle/kokoro-onnx)
+(full-precision model), and the music bed and sound effects are synthesised in code, so the whole soundtrack is royalty-free.
+
+Production details: cinematic cold open, TM diagonal-stripe chapter transitions, mask-reveal titles,
+slow camera push-in, animated perspective grid and particles, film grain against banding, a music bed
+ducked under the voice, and a master encode at CRF 16 (x264 slow, BT.709, AAC 320k).
 
 ## Chapters
 
@@ -28,6 +33,8 @@ script/narration.json   Narration per scene: `text` (display / captions) and `sa
 script/captions.srt     English subtitles generated from the narration timing
 scripts/tokenize.mjs    Computes the real token splits shown on screen → src/data/tokens.json
 scripts/voiceover.py    Offline Kokoro TTS → public/voiceover/*.wav + src/data/voiceover.json (sentence timings)
+scripts/mix_audio.py    Music bed + SFX + voice → public/audio/soundtrack.m4a (the audio used in the render)
+scripts/timeline.py     Scene timing shared with src/timeline.ts (both read src/data/timing.json)
 scripts/captions.mjs    Builds script/captions.srt
 src/Video.tsx           Timeline: scene lengths and animation beats are driven by the voiceover timings
 src/scenes/             One component per chapter
@@ -39,17 +46,18 @@ public/brand, fonts     TM Global logo, CTA element, HK Grotesk Wide, Roboto, Je
 
 ```bash
 npm install
-pip install kokoro-onnx soundfile        # voiceover only
+pip install kokoro-onnx soundfile scipy  # voiceover + soundtrack only
 
 npm run tokens                           # optional: recompute token splits
 npm run voiceover                        # regenerate narration (downloads Kokoro model on first run)
+python3 scripts/mix_audio.py             # rebuild the soundtrack (always after a voiceover change)
 node scripts/captions.mjs                # regenerate subtitles
 npm run studio                           # preview / scrub in the browser
-npm run render                           # → out/gpu-to-token.mp4
+npm run render                           # → out/gpu-to-token.mp4 (master quality)
 ```
 
 Editing the narration: change `text` and `say` in `script/narration.json`, then run
-`python3 scripts/voiceover.py --only <scene-id>`. Every animation beat is keyed to a
+`python3 scripts/voiceover.py --only <scene-id>` followed by `python3 scripts/mix_audio.py`. Every animation beat is keyed to a
 sentence index, so the visuals re-time themselves automatically. To change the voice, pass
 `--voice am_michael` (or any other Kokoro voice) and `--speed`.
 

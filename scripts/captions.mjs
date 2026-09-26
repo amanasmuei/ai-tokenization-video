@@ -2,8 +2,8 @@
 // Caption text comes from `text` (display spelling); timing comes from the synthesised `say` sentences.
 import { readFileSync, writeFileSync } from "node:fs";
 
-const FPS = 30;
-const LEAD_IN = 12 / FPS; // must match LEAD_IN in src/Video.tsx
+const timing = JSON.parse(readFileSync("src/data/timing.json", "utf8"));
+const FPS = timing.fps;
 const scenes = JSON.parse(readFileSync("script/narration.json", "utf8"));
 const vo = JSON.parse(readFileSync("src/data/voiceover.json", "utf8"));
 const split = (t) => t.split(/(?<=[.!?])\s+(?=[A-Z])/).map((s) => s.trim()).filter(Boolean);
@@ -16,9 +16,13 @@ const ts = (s) => {
 let offset = 0;
 let n = 1;
 const out = [];
-for (const s of scenes) {
+scenes.forEach((s, idx) => {
   const v = vo[s.id];
-  const dur = Math.ceil(v.duration * FPS) / FPS + LEAD_IN;
+  // same maths as src/timeline.ts
+  const leadFrames = timing.leadIn + (idx === 0 ? timing.intro : 0);
+  const LEAD_IN = leadFrames / FPS;
+  const durFrames = Math.ceil(v.duration * FPS) + leadFrames + (idx === scenes.length - 1 ? timing.outroHold : 0);
+  const dur = durFrames / FPS;
   const say = v.sentences;
   const text = split(s.text);
   const speechEnd = v.duration - 0.6;
@@ -37,6 +41,6 @@ for (const s of scenes) {
     out.push(`${n++}\n${ts(offset + LEAD_IN + a)} --> ${ts(offset + LEAD_IN + b)}\n${line}\n`);
   });
   offset += dur;
-}
+});
 writeFileSync("script/captions.srt", out.join("\n"));
 console.log(`wrote ${n - 1} captions, ${offset.toFixed(1)} s`);
