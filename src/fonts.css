@@ -1,0 +1,8 @@
+@font-face { font-family: "HK Grotesk Wide"; src: url("../public/fonts/HKGroteskWide-Bold.otf") format("opentype"); font-weight: 700; }
+@font-face { font-family: "HK Grotesk Wide"; src: url("../public/fonts/HKGroteskWide-Black.otf") format("opentype"); font-weight: 900; }
+@font-face { font-family: "Roboto"; src: url("../public/fonts/roboto-latin-300-normal.woff2") format("woff2"); font-weight: 300; }
+@font-face { font-family: "Roboto"; src: url("../public/fonts/roboto-latin-400-normal.woff2") format("woff2"); font-weight: 400; }
+@font-face { font-family: "Roboto"; src: url("../public/fonts/roboto-latin-500-normal.woff2") format("woff2"); font-weight: 500; }
+@font-face { font-family: "Roboto"; src: url("../public/fonts/roboto-latin-700-normal.woff2") format("woff2"); font-weight: 700; }
+@font-face { font-family: "JetBrains Mono"; src: url("../public/fonts/jetbrains-mono-latin-400-normal.woff2") format("woff2"); font-weight: 400; }
+@font-face { font-family: "JetBrains Mono"; src: url("../public/fonts/jetbrains-mono-latin-700-normal.woff2") format("woff2"); font-weight: 700; }

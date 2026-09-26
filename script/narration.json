@@ -1,0 +1,57 @@
+[
+  {
+    "id": "hook",
+    "text": "Every answer an AI model gives you is built one token at a time. Behind every token sits a chain of silicon, memory, networking and power. This is the journey from GPU to token, and why the token has become the unit of AI economics.",
+    "say": "Every answer an AI model gives you, is built one token at a time. Behind every token, sits a chain of silicon, memory, networking, and power. This is the journey from GPU to token. And why the token has become the unit of AI economics."
+  },
+  {
+    "id": "silicon",
+    "text": "It starts with the accelerator. An NVIDIA H100 packs 132 streaming multiprocessors with fourth-generation Tensor Cores: roughly one petaFLOP of dense BF16 compute, and two at FP8. But compute is only half the story. 80 GB of HBM3 feeds those cores at 3.35 terabytes per second. H200 raises that to 141 GB at 4.8 TB/s, and Blackwell goes further, with native FP4.",
+    "say": "It starts with the accelerator. An Nvidia H one hundred packs one hundred and thirty-two streaming multiprocessors, with fourth-generation Tensor Cores. Roughly one petaflop of dense BF sixteen compute, and two at FP eight. But compute is only half the story. Eighty gigabytes of HBM three feed those cores at three point three five terabytes per second. The H two hundred raises that to one hundred and forty-one gigabytes, at four point eight terabytes per second. And Blackwell goes further, with native FP four."
+  },
+  {
+    "id": "cluster",
+    "text": "One GPU is never enough. Inside an HGX server, eight GPUs are joined by NVLink and NVSwitch at 900 GB/s per GPU, so they act as one large accelerator. Across servers, a rail-optimised 400-gigabit InfiniBand or RoCE fabric, one NIC per GPU, links thousands of GPUs into a single cluster. Add parallel storage for data and checkpoints, and serious power and cooling: an eight-GPU server draws around ten kilowatts; a rack-scale Blackwell NVL72 needs around 120, with direct liquid cooling.",
+    "say": "One GPU is never enough. Inside an HGX server, eight GPUs are joined by NV Link and NV Switch, at nine hundred gigabytes per second per GPU, so they act as one large accelerator. Across servers, a rail-optimised, four-hundred-gigabit InfiniBand or Rocky fabric, with one network card per GPU, links thousands of GPUs into a single cluster. Add parallel storage for data and checkpoints, and serious power and cooling. An eight-GPU server draws around ten kilowatts. A rack-scale Blackwell NVL seventy-two, needs around one hundred and twenty, with direct liquid cooling."
+  },
+  {
+    "id": "gpuaas",
+    "text": "Building this is capital-intensive, and GPU generations turn over every year or two. GPU-as-a-Service turns that infrastructure into an elastic, multi-tenant platform. Bare-metal nodes and GPU-passthrough VMs at the base. Kubernetes with the GPU Operator, or Slurm, for orchestration. Multi-Instance GPU splits one H100 into up to seven isolated slices. DCGM telemetry tracks utilisation, memory, power and errors. Customers consume it by the GPU-hour. With TM GPUaaS, on sovereign, Malaysia-hosted infrastructure.",
+    "say": "Building this is capital-intensive, and GPU generations turn over every year or two. GPU as a Service turns that infrastructure into an elastic, multi-tenant platform. Bare-metal nodes, and GPU pass-through virtual machines at the base. Kubernetes with the GPU Operator, or Slurm, for orchestration. Multi-Instance GPU splits one H one hundred into up to seven isolated slices. DCGM telemetry tracks utilisation, memory, power, and errors. Customers consume it by the GPU hour. And with TM GPU as a Service, on sovereign, Malaysia-hosted infrastructure."
+  },
+  {
+    "id": "tokens",
+    "text": "But a language model doesn't think in GPU-hours. It thinks in tokens. A byte-pair-encoding tokenizer splits text into sub-word units from a fixed vocabulary: about 100 thousand entries in GPT-4's cl100k, 200 thousand in o200k. Each token becomes an integer ID, then an embedding vector. And tokenization is not language-neutral. The same sentence in Bahasa Melayu costs 36 percent more tokens with o200k, and 82 percent more with cl100k. More tokens means more compute, more latency, more cost.",
+    "say": "But a language model doesn't think in GPU hours. It thinks in tokens. A byte-pair-encoding tokenizer splits text into sub-word units, from a fixed vocabulary. About one hundred thousand entries in GPT four's CL one hundred K, and two hundred thousand in O two hundred K. Each token becomes an integer ID, then an embedding vector. And tokenization is not language-neutral. The same sentence in Bahasa Melayu costs thirty-six percent more tokens with O two hundred K, and eighty-two percent more with CL one hundred K. More tokens means more compute, more latency, and more cost."
+  },
+  {
+    "id": "phases",
+    "text": "Inference runs in two phases. Prefill processes the whole prompt in parallel. It is compute-bound, and it sets time-to-first-token. Decode then generates one token per step, and every step streams the full set of weights from HBM. That makes decode memory-bandwidth-bound. Llama 3.1 8B in BF16 is 16 GB of weights. At 3.35 TB/s, a single stream tops out near 200 tokens per second, while the Tensor Cores sit mostly idle.",
+    "say": "Inference runs in two phases. Prefill processes the whole prompt in parallel. It is compute-bound, and it sets time to first token. Decode then generates one token per step, and every step streams the full set of weights from HBM. That makes decode memory-bandwidth bound. Llama three point one, eight B, in BF sixteen, is sixteen gigabytes of weights. At three point three five terabytes per second, a single stream tops out near two hundred tokens per second, while the Tensor Cores sit mostly idle."
+  },
+  {
+    "id": "kvcache",
+    "text": "To avoid recomputing attention, every token's keys and values are cached. For Llama 3.1 70B, with 80 layers and grouped-query attention, that's 320 KB per token in BF16. One 128K-token context needs about 40 GB of KV cache: memory that competes directly with batch size, and therefore with throughput.",
+    "say": "To avoid recomputing attention, every token's keys and values are cached. For Llama three point one, seventy B, with eighty layers and grouped-query attention, that's three hundred and twenty kilobytes per token, in BF sixteen. One context of one hundred and twenty-eight thousand tokens needs about forty gigabytes of KV cache. Memory that competes directly with batch size, and therefore with throughput."
+  },
+  {
+    "id": "serving",
+    "text": "This is where the serving stack earns its keep. Continuous batching shares each weight read across many requests. PagedAttention allocates KV cache in blocks, eliminating fragmentation. FlashAttention keeps attention on-chip. FP8 and FP4 quantisation cut bytes per weight. Speculative decoding drafts several tokens and verifies them in one pass. Prefix caching reuses shared prompts, and disaggregated serving puts prefill and decode on separately tuned GPU pools. Engines like vLLM, SGLang and TensorRT-LLM combine these for order-of-magnitude gains.",
+    "say": "This is where the serving stack earns its keep. Continuous batching shares each weight read across many requests. Paged Attention allocates KV cache in blocks, eliminating fragmentation. Flash Attention keeps attention on-chip. FP eight, and FP four quantisation, cut bytes per weight. Speculative decoding drafts several tokens, and verifies them in one pass. Prefix caching reuses shared prompts, and disaggregated serving puts prefill and decode on separately tuned GPU pools. Engines like vLLM, SG Lang, and Tensor RT LLM, combine these, for order-of-magnitude gains."
+  },
+  {
+    "id": "economics",
+    "text": "So the real output of a GPU is tokens per second, delivered within latency targets for time-to-first-token and inter-token latency. That gives the core equation of AI economics. Cost per million tokens equals the GPU-hour cost, divided by tokens per hour, times one million. Illustratively: at ten dollars per GPU-hour and 200 tokens per second, that's nearly fourteen dollars per million tokens. Optimise the same GPU to 5,000 tokens per second, and it drops to about 56 cents. Same hardware. Twenty-five times cheaper tokens.",
+    "say": "So the real output of a GPU is tokens per second, delivered within latency targets, for time to first token, and inter-token latency. That gives the core equation of AI economics. Cost per million tokens, equals the GPU hour cost, divided by tokens per hour, times one million. Illustratively, at ten dollars per GPU hour, and two hundred tokens per second, that's nearly fourteen dollars per million tokens. Optimise the same GPU to five thousand tokens per second, and it drops to about fifty-six cents. Same hardware. Twenty-five times cheaper tokens."
+  },
+  {
+    "id": "stack",
+    "text": "That is why the industry is moving up the stack: from selling hardware, to selling GPU-hours, to selling tokens. Model-as-a-Service endpoints with OpenAI-compatible APIs, metered per input and output token, let customers pay for intelligence produced, not for idle capacity. For the provider, the metric that matters becomes tokens per second per GPU, and ultimately, tokens per watt.",
+    "say": "That is why the industry is moving up the stack. From selling hardware, to selling GPU hours, to selling tokens. Model as a Service endpoints, with Open AI compatible APIs, metered per input and output token, let customers pay for intelligence produced, not for idle capacity. For the provider, the metric that matters becomes tokens per second per GPU. And ultimately, tokens per watt."
+  },
+  {
+    "id": "outro",
+    "text": "From silicon, to GPUaaS, to tokens. TM GPUaaS: sovereign GPU cloud for AI, built for the token economy.",
+    "say": "From silicon, to GPU as a Service, to tokens. TM GPU as a Service. Sovereign GPU cloud for AI, built for the token economy."
+  }
+]

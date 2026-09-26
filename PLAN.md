@@ -1,6 +1,9 @@
 # Pelan Video: "Dari GPU ke Token" — AI Tokenization
 
-> Status: **DRAF PELAN** — menunggu pengesahan sebelum produksi.
+> Status: **DILAKSANAKAN** — keputusan akhir: Pilihan A (Remotion), branding TM GPUaaS, suara AI (Kokoro, offline),
+> **bahasa English**, gaya moden & profesional, fokus teknikal untuk dipersembahkan oleh pakar AI.
+> Struktur & kandungan teknikal akhir: lihat `README.md` dan `script/narration.json`.
+> Draf asal di bawah dikekalkan sebagai rujukan.
 
 ## 1. Matlamat
 
